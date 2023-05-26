@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.AccessDenied;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,28 +19,36 @@ import java.util.stream.Collectors;
 public class ItemService {
 
     private final ItemRepository itemRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     public ItemDto add(ItemDto dto, Long userId) {
-        userCheck(userId);
         log.info("POST item request received to endpoint [/items]");
         if (!validation(dto)) {
             log.error("Validation exception for item");
             throw new ValidationException("Item is invalid");
         }
-        Item item = itemRepository.add(ItemMapper.toItem(dto, UserMapper.toUser(userService.get(userId))));
-        userService.addOwnedItem(userId, item.getId());
+        Item item = itemRepository.add(ItemMapper.toItem(dto, userRepository.getById(userId)));
+        userRepository.addOwnedItem(userId, item.getId());
         return ItemMapper.toItemDto(item);
     }
 
     public ItemDto update(Long userId, Long itemId, ItemDto dto) {
-        userCheck(userId);
         log.info("PATCH item request received to endpoint [/items] with userId = {}, itemId = {}", userId, itemId);
-        if (!Objects.equals(itemRepository.get(itemId).getOwner().getId(), userId)) {
+        Item item = itemRepository.get(itemId);
+        if (!Objects.equals(item.getOwner().getId(), userId)) {
             log.error("Access denied for userId = {}", userId);
             throw new AccessDenied("Access denied");
         }
-        return ItemMapper.toItemDto(itemRepository.update(userId, itemId, ItemMapper.toItem(dto)));
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            item.setName(dto.getName());
+        }
+        if (dto.getDescription() != null && !dto.getDescription().isBlank()) {
+            item.setDescription(dto.getDescription());
+        }
+        if (dto.getAvailable() != null) {
+            item.setAvailable(dto.getAvailable());
+        }
+        return ItemMapper.toItemDto(itemRepository.update(item));
     }
 
     public ItemDto get(Long itemId) {
@@ -55,8 +62,7 @@ public class ItemService {
 
     public List<ItemDto> getList(Long userId) {
         log.info("GET item list request received to endpoint [/items] with userId = {}", userId);
-        userCheck(userId);
-        return itemRepository.getList(userService.get(userId).getItems())
+        return itemRepository.getList(userRepository.getById(userId).getItems())
                 .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
@@ -81,7 +87,7 @@ public class ItemService {
             log.error("UserId is empty");
             throw new ValidationException("UserId is empty");
         }
-        if (userService.get(userId) == null) {
+        if (userRepository.getById(userId) == null) {
             log.error("User not found exception");
             throw new NotFoundException("User not found exception");
         }

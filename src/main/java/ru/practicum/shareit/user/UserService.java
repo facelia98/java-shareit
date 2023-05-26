@@ -18,7 +18,7 @@ public class UserService {
         log.info("POST user request received to endpoint [/users]");
         if (userValidate(dto)) {
             if (checkEmail(dto.getId(), dto.getEmail())) {
-                return userRepository.add(UserMapper.toUser(dto));
+                return UserMapper.toUserDto(userRepository.add(UserMapper.toUser(dto)));
             }
             return null;
         } else {
@@ -31,15 +31,15 @@ public class UserService {
         log.info("PATCH user request received to endpoint [/users] id = {}", id);
         if (dto.getEmail() != null) {
             if (checkEmail(id, dto.getEmail())) {
-                return userRepository.updateUser(id, UserMapper.toUser(dto));
+                return UserMapper.toUserDto(userRepository.updateUser(id, UserMapper.toUser(dto)));
             }
         }
-        return userRepository.updateUser(id, UserMapper.toUser(dto));
+        return UserMapper.toUserDto(userRepository.updateUser(id, UserMapper.toUser(dto)));
     }
 
     public UserDto get(Long id) {
         log.info("GET user request received to endpoint [/users] id = {}", id);
-        return userRepository.getById(id);
+        return UserMapper.toUserDto(userRepository.getById(id));
     }
 
     public boolean delete(Long id) {

@@ -18,10 +18,10 @@ public class UserRepositoryImpl implements UserRepository {
     private Long id;
 
     @Override
-    public UserDto add(User user) {
+    public User add(User user) {
         user.setId(getNewId());
         userMap.put(user.getId(), user.getEmail(), user);
-        return UserMapper.toUserDto(user);
+        return user;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public UserDto updateUser(Long userId, User user) {
+    public User updateUser(Long userId, User user) {
         if (!userMap.row(userId).values().stream().findFirst().isPresent()) {
             log.error("User not found exception for id = {}", userId);
             throw new NotFoundException("Пользователь с указанным id не существует");
@@ -63,16 +63,16 @@ public class UserRepositoryImpl implements UserRepository {
             tmpUser.setName(user.getName());
         }
         userMap.put(userId, tmpUser.getEmail(), tmpUser);
-        return UserMapper.toUserDto(tmpUser);
+        return tmpUser;
     }
 
     @Override
-    public UserDto getById(Long userId) {
+    public User getById(Long userId) {
         if (!userMap.containsRow(userId)) {
             log.error("User not found exception for id = {}", userId);
             throw new NotFoundException("Пользователь с указанным id не существует");
         }
-        return UserMapper.toUserDto(userMap.row(userId).values().stream().findFirst().get());
+        return userMap.row(userId).values().stream().findFirst().get();
     }
 
     @Override

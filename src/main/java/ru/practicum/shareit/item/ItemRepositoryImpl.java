@@ -26,27 +26,16 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item update(Long userId, Long itemId, Item item) {
-        if (itemMap.get(itemId) == null) {
-            log.error("Item not found exception for id = {}", itemId);
-            throw new NotFoundException("Вещь с указанным id не существует");
-        }
-        Item tmpItem = itemMap.get(itemId);
-        if (item.getName() != null && !item.getName().isBlank()) {
-            tmpItem.setName(item.getName());
-        }
-        if (item.getDescription() != null && !item.getDescription().isBlank()) {
-            tmpItem.setDescription(item.getDescription());
-        }
-        if (item.getAvailable() != null) {
-            tmpItem.setAvailable(item.getAvailable());
-        }
-        itemMap.put(itemId, tmpItem);
-        return tmpItem;
+    public Item update(Item item) {
+        return itemMap.put(item.getId(), item);
     }
 
     @Override
     public Item get(Long itemId) {
+        if (itemMap.get(itemId) == null) {
+            log.error("Item not found exception for id = {}", itemId);
+            throw new NotFoundException("Вещь с указанным id не существует");
+        }
         return itemMap.get(itemId);
     }
 
