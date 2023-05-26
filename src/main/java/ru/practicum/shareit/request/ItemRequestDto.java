@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemRequest {
+public class ItemRequestDto {
     private Long id;
     private String description;
     private LocalDateTime created;
