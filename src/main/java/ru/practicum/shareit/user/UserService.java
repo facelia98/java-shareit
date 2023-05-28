@@ -71,4 +71,8 @@ public class UserService {
                 dto.getEmail() != null &&
                 !dto.getName().isBlank();
     }
+
+    public void addOwnedItem(Long userId, Long itemId) {
+        userRepository.addOwnedItem(userId, itemId);
+    }
 }

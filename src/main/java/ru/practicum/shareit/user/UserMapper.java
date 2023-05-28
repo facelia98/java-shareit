@@ -5,7 +5,8 @@ public class UserMapper {
         return new UserDto(
                 user.getId(),
                 user.getEmail(),
-                user.getName()
+                user.getName(),
+                user.getItems()
         );
     }
 
@@ -13,7 +14,8 @@ public class UserMapper {
         return new User(
                 userDto.getId(),
                 userDto.getEmail(),
-                userDto.getName()
+                userDto.getName(),
+                userDto.getItems()
         );
     }
 }

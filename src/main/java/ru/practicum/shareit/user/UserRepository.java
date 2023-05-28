@@ -14,4 +14,6 @@ public interface UserRepository {
     UserDto getById(Long id);
 
     boolean deleteUser(Long id);
+
+    void addOwnedItem(Long userId, Long itemId);
 }

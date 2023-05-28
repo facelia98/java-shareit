@@ -5,28 +5,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exceptions.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
-    Map<Long, Item> itemMap = new HashMap<>();
+    private final Map<Long, Item> itemMap = new HashMap<>();
     private Long id;
 
     @Override
-    public ItemDto add(Item item) {
+    public Item add(Item item) {
         item.setId(getNewId());
         itemMap.put(item.getId(), item);
-        return ItemMapper.toItemDto(item);
+        return item;
     }
 
     @Override
-    public ItemDto update(Long userId, Long itemId, Item item) {
+    public Item update(Long userId, Long itemId, Item item) {
         if (itemMap.get(itemId) == null) {
             log.error("Item not found exception for id = {}", itemId);
             throw new NotFoundException("Вещь с указанным id не существует");
@@ -42,20 +42,21 @@ public class ItemRepositoryImpl implements ItemRepository {
             tmpItem.setAvailable(item.getAvailable());
         }
         itemMap.put(itemId, tmpItem);
-        return ItemMapper.toItemDto(tmpItem);
+        return tmpItem;
     }
 
     @Override
-    public ItemDto get(Long itemId) {
-        return ItemMapper.toItemDto(itemMap.get(itemId));
+    public Item get(Long itemId) {
+        return itemMap.get(itemId);
     }
 
     @Override
-    public List<ItemDto> getList(Long userId) {
-        return itemMap.values().stream()
-                .filter(item -> Objects.equals(item.getOwner().getId(), userId))
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+    public List<Item> getList(List<Long> itemsId) {
+        List<Item> items = new ArrayList<>();
+        for (Long l : itemsId) {
+            items.add(itemMap.get(l));
+        }
+        return items;
     }
 
     @Override
