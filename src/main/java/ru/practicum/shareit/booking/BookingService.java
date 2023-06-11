@@ -19,6 +19,7 @@ import ru.practicum.shareit.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,7 +65,7 @@ public class BookingService {
     public BookingReturningDto update(Long userId, Long bookingId, boolean approved) {
         log.info("PATCH booking request received to endpoint [/bookings]");
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Booking not found"));
-        if (booking.getItem().getOwner().getId() != userId) {
+        if (!Objects.equals(booking.getItem().getOwner().getId(), userId)) {
             log.error("Access denied for userId = {}", userId);
             throw new AccessDenied("Access denied");
         }
@@ -106,32 +107,32 @@ public class BookingService {
             case "ALL":
                 return bookingRepository.findAllByBookerIdOrderByStartDesc(userId)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "PAST":
                 return bookingRepository.findBookingByBookerIdAndEndIsBeforeOrderByStartDesc(userId, currentTime)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "FUTURE":
                 return bookingRepository.findBookingByBookerIdAndEndIsAfterOrderByStartDesc(userId, currentTime)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "WAITING":
                 return bookingRepository.findBookingByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "REJECTED":
                 return bookingRepository.findBookingByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "CURRENT":
                 return bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, currentTime, currentTime)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .sorted(Comparator.comparing(BookingReturningDto::getStart))
                         .collect(Collectors.toList());
             default:
@@ -150,32 +151,32 @@ public class BookingService {
             case "ALL":
                 return bookingRepository.findAllForOwner(userId)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "PAST":
                 return bookingRepository.findAllForOwnerAndBeforeInstant(userId, currentTime)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "FUTURE":
                 return bookingRepository.findAllByOwnerIdAndStartAfterOrderByStartDesc(userId, currentTime)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "WAITING":
                 return bookingRepository.findAllForOwner(userId, Status.WAITING)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "REJECTED":
                 return bookingRepository.findAllForOwner(userId, Status.REJECTED)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             case "CURRENT":
                 return bookingRepository.findAllForOwnerCurrent(userId, currentTime)
                         .stream()
-                        .map(booking -> BookingMapper.toBookingReturningDto(booking))
+                        .map(BookingMapper::toBookingReturningDto)
                         .collect(Collectors.toList());
             default:
                 throw new UnsupportedStatus(String.format("Unknown state: %s", state));
