@@ -16,18 +16,6 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
-    /*
-        @GetMapping("/{itemId}")
-        public List<CommentDto> getComments(@RequestHeader("X-Sharer-User-Id") Long userId) {
-            return itemService.getComments(itemId);
-        }
-
-        @GetMapping("/{itemId}")
-        public List<CommentDto> getComments(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                     @PathVariable("itemId") Long itemId) {
-            return itemService.getComments(itemId);
-        }
-    */
     @PostMapping("/{itemId}/comment")
     public CommentDto addNewComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                     @RequestBody CommentDto comment,
