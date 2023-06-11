@@ -3,14 +3,21 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDenied;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
+import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.comment.CommentMapper;
+import ru.practicum.shareit.item.comment.CommentRepository;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemRDto;
+import ru.practicum.shareit.status.Status;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,7 +26,9 @@ import java.util.stream.Collectors;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
     public ItemDto add(ItemDto dto, Long userId) {
         log.info("POST item request received to endpoint [/items]");
@@ -27,14 +36,19 @@ public class ItemService {
             log.error("Validation exception for item");
             throw new ValidationException("Item is invalid");
         }
-        Item item = itemRepository.add(ItemMapper.toItem(dto, userRepository.getById(userId)));
-        userRepository.addOwnedItem(userId, item.getId());
-        return ItemMapper.toItemDto(item);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User not found for id = %d", userId)));
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(dto, user)));
     }
 
     public ItemDto update(Long userId, Long itemId, ItemDto dto) {
         log.info("PATCH item request received to endpoint [/items] with userId = {}, itemId = {}", userId, itemId);
-        Item item = itemRepository.get(itemId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() ->
+                {
+                    log.error("Item not found exception for id = {}", itemId);
+                    throw new NotFoundException(String.format("Item not found for id = %d", itemId));
+                });
         if (!Objects.equals(item.getOwner().getId(), userId)) {
             log.error("Access denied for userId = {}", userId);
             throw new AccessDenied("Access denied");
@@ -48,22 +62,36 @@ public class ItemService {
         if (dto.getAvailable() != null) {
             item.setAvailable(dto.getAvailable());
         }
-        return ItemMapper.toItemDto(itemRepository.update(item));
+        itemRepository.updateByNotNullFields(itemId, item.getDescription(), item.getName(), item.getAvailable());
+        return ItemMapper.toItemDto(itemRepository.getById(itemId));
     }
 
-    public ItemDto get(Long itemId) {
+    public ItemRDto get(Long itemId, Long userId) {
         log.info("GET item request received to endpoint [/items] with itemId = {}", itemId);
-        if (itemRepository.get(itemId) == null) {
-            log.error("Item not found exception for itemId = {}", itemId);
-            throw new NotFoundException("Item not found exception");
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() ->
+                {
+                    log.error("Item not found exception for id = {}", itemId);
+                    throw new NotFoundException(String.format("Item not found for id = %d", itemId));
+                });
+        if (item.getOwner().getId().equals(userId)) {
+            return ItemMapper.toItemRDto(item, bookingRepository.findAllForItemId(itemId), commentRepository.findAllByItem_Id(itemId));
         }
-        return ItemMapper.toItemDto(itemRepository.get(itemId));
+        return ItemMapper.toItemRDto(item, new ArrayList<>(), commentRepository.findAllByItem_Id(itemId));
     }
 
-    public List<ItemDto> getList(Long userId) {
+    public List<ItemRDto> getList(Long userId) {
         log.info("GET item list request received to endpoint [/items] with userId = {}", userId);
-        return itemRepository.getList(userRepository.getById(userId).getItems())
-                .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        if (!userRepository.existsById(userId)) {
+            log.error("User not found for id = {}", userId);
+            throw new NotFoundException(String.format("User not found for id = %d", userId));
+        }
+        List<Item> items = itemRepository.findAllByOwner_Id(userId);
+        return items.stream().map(item ->
+                        ItemMapper.toItemRDto(item, bookingRepository.findAllForItemId(item.getId()),
+                                commentRepository.findAllByItem_Id(item.getId())))
+                .sorted(Comparator.comparing(ItemRDto::getId))
+                .collect(Collectors.toList());
     }
 
     private boolean validation(ItemDto dto) {
@@ -75,21 +103,36 @@ public class ItemService {
     public List<ItemDto> search(String query) {
         log.info("GET item list request received to endpoint [/items] with query = {}", query);
         if (query.isBlank()) {
-            log.info("Empty query string for searching");
+            log.warn("Empty query string for searching");
             return Collections.emptyList();
         }
-        return itemRepository.search(query);
+        return itemRepository.search(query)
+                .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
-
-    private void userCheck(Long userId) {
-        if (userId == null) {
-            log.error("UserId is empty");
-            throw new ValidationException("UserId is empty");
+    public CommentDto addNewComment(CommentDto comment, Long userId, Long itemId) {
+        log.info("POST comment request received to endpoint [/items]");
+        if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, LocalDateTime.now(), Status.REJECTED).isEmpty()) {
+            log.warn("Booking for item_id = {} by user_id = {} is not ended!", itemId, userId);
+            throw new ValidationException("Booking is not ended!");
         }
-        if (userRepository.getById(userId) == null) {
-            log.error("User not found exception");
-            throw new NotFoundException("User not found exception");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                {
+                    log.error("User not found exception for id = {}", userId);
+                    throw new NotFoundException(String.format("User not found for id = %d", userId));
+                });
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() ->
+                {
+                    log.error("Item not found exception for id = {}", itemId);
+                    throw new NotFoundException(String.format("Item not found for id = %d", itemId));
+                });
+        if (comment.getText().isBlank()) {
+            log.error("Comment is empty!");
+            throw new ValidationException("Blank comment value!");
         }
+        return CommentMapper.toCommentDto(
+                commentRepository.save(CommentMapper.toComment(comment, item, user, LocalDateTime.now())));
     }
 }
