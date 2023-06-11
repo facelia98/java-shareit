@@ -3,6 +3,9 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemRDto;
 
 import java.util.List;
 
@@ -12,6 +15,25 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
+
+    /*
+        @GetMapping("/{itemId}")
+        public List<CommentDto> getComments(@RequestHeader("X-Sharer-User-Id") Long userId) {
+            return itemService.getComments(itemId);
+        }
+
+        @GetMapping("/{itemId}")
+        public List<CommentDto> getComments(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                     @PathVariable("itemId") Long itemId) {
+            return itemService.getComments(itemId);
+        }
+    */
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addNewComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                    @RequestBody CommentDto comment,
+                                    @PathVariable("itemId") Long itemId) {
+        return itemService.addNewComment(comment, userId, itemId);
+    }
 
     @PostMapping
     public ItemDto addNewItem(@RequestHeader("X-Sharer-User-Id") Long userId,
@@ -33,13 +55,13 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                           @PathVariable("id") Long itemId) {
-        return itemService.get(itemId);
+    public ItemRDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                            @PathVariable("id") Long itemId) {
+        return itemService.get(itemId, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsListForOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemRDto> getItemsListForOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.getList(userId);
     }
 }

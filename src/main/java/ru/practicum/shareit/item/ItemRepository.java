@@ -1,15 +1,24 @@
 package ru.practicum.shareit.item;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
-public interface ItemRepository {
-    Item add(Item item);
+@Transactional
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Item update(Item item);
+    @Query(" select i from Item i " +
+            "where i.available = true and (upper(i.name) like upper(concat('%', ?1, '%')) " +
+            " or upper(i.description) like upper(concat('%', ?1, '%')))")
+    List<Item> search(String query);
 
-    Item get(Long itemId);
+    @Query("UPDATE Item i SET i.description = ?2, i.name = ?3, i.available = ?4 WHERE i.id = ?1")
+    @Modifying
+    void updateByNotNullFields(Long itemId, String description, String name, boolean isAvailable);
 
-    List<Item> getList(List<Long> itemsId);
-
-    List<ItemDto> search(String query);
+    @Query("SELECT i FROM Item i WHERE i.owner.id = ?1")
+    List<Item> findAllByOwner_Id(Long ownerId);
 }
