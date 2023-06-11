@@ -44,8 +44,7 @@ public class ItemService {
     public ItemDto update(Long userId, Long itemId, ItemDto dto) {
         log.info("PATCH item request received to endpoint [/items] with userId = {}, itemId = {}", userId, itemId);
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() ->
-                {
+                .orElseThrow(() -> {
                     log.error("Item not found exception for id = {}", itemId);
                     throw new NotFoundException(String.format("Item not found for id = %d", itemId));
                 });
@@ -69,8 +68,7 @@ public class ItemService {
     public ItemRDto get(Long itemId, Long userId) {
         log.info("GET item request received to endpoint [/items] with itemId = {}", itemId);
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() ->
-                {
+                .orElseThrow(() -> {
                     log.error("Item not found exception for id = {}", itemId);
                     throw new NotFoundException(String.format("Item not found for id = %d", itemId));
                 });
@@ -117,14 +115,12 @@ public class ItemService {
             throw new ValidationException("Booking is not ended!");
         }
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                {
+                .orElseThrow(() -> {
                     log.error("User not found exception for id = {}", userId);
                     throw new NotFoundException(String.format("User not found for id = %d", userId));
                 });
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() ->
-                {
+                .orElseThrow(() -> {
                     log.error("Item not found exception for id = {}", itemId);
                     throw new NotFoundException(String.format("Item not found for id = %d", itemId));
                 });
