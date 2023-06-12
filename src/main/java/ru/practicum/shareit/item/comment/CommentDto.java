@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.comment;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.item.Item;
 
 import java.time.LocalDateTime;
 
