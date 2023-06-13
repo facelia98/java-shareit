@@ -22,4 +22,5 @@ public interface BookingService {
 
     @Transactional(readOnly = true)
     List<BookingReturningDto> findAllForOwner(Long userId, String state);
+
 }

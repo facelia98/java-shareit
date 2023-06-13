@@ -10,6 +10,13 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+    @Query("select (count(b) > 0) from Booking b " +
+            "where b.item.id = ?3 and b.status = 'APPROVED' and b.start <= ?2 and b.end >= ?1")
+    boolean isAvailableForBooking(LocalDateTime start, LocalDateTime end, Long itemId);
+
+    @Query("select case when ?2 > ?1 AND ?3 < ?1 then true else false end from Item")
+    boolean checkForBooking(LocalDateTime start, LocalDateTime end, LocalDateTime now);
+
     List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId);
 
     List<Booking> findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(Long bookerId, Long itemId, LocalDateTime instant, Status status);

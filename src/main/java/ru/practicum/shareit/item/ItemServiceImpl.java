@@ -125,11 +125,16 @@ public class ItemServiceImpl implements ItemService {
                     log.error("User not found exception for id = {}", userId);
                     throw new NotFoundException(String.format("User not found for id = %d", userId));
                 });
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> {
+                    log.error("Item not found exception for id = {}", userId);
+                    throw new NotFoundException(String.format("Item not found for id = %d", userId));
+                });
         if (comment.getText().isBlank()) {
             log.error("Comment is empty!");
             throw new ValidationException("Blank comment value!");
         }
         return CommentMapper.toCommentDto(
-                commentRepository.save(CommentMapper.toComment(comment, user, LocalDateTime.now())));
+                commentRepository.save(CommentMapper.toComment(comment, user, item, LocalDateTime.now())));
     }
 }
