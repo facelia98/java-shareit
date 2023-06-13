@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 
@@ -16,6 +17,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDto add(UserDto dto) {
         log.info("POST user request received to endpoint [/users]");
         if (userValidate(dto)) {
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(Long id, UserDto dto) {
         log.info("PATCH user request received to endpoint [/users] id = {}", id);
         UserDto user = get(id);
@@ -49,6 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto get(Long id) {
         log.info("GET user request received to endpoint [/users] id = {}", id);
         return UserMapper.toUserDto(userRepository.findById(id)
@@ -56,12 +60,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         log.info("DELETE user request received to endpoint [/users] id = {}", id);
         userRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getAll() {
         log.info("GET all users request received to endpoint [/users]");
         return userRepository.findAll()

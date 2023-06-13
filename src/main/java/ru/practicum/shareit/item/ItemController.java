@@ -14,41 +14,41 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 public class ItemController {
-    private final ItemServiceImpl itemServiceImpl;
+    private final ItemService itemService;
 
     @PostMapping("/{itemId}/comment")
     public CommentDto addNewComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                     @RequestBody CommentDto comment,
                                     @PathVariable("itemId") Long itemId) {
-        return itemServiceImpl.addNewComment(comment, userId, itemId);
+        return itemService.addNewComment(comment, userId, itemId);
     }
 
     @PostMapping
     public ItemDto addNewItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @RequestBody ItemDto item) {
-        return itemServiceImpl.add(item, userId);
+        return itemService.add(item, userId);
     }
 
     @PatchMapping("/{id}")
     public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @PathVariable("id") Long itemId,
                               @RequestBody ItemDto item) {
-        return itemServiceImpl.update(userId, itemId, item);
+        return itemService.update(userId, itemId, item);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam("text") String query) {
-        return itemServiceImpl.search(query);
+        return itemService.search(query);
     }
 
     @GetMapping("/{id}")
     public ItemRDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
                             @PathVariable("id") Long itemId) {
-        return itemServiceImpl.get(itemId, userId);
+        return itemService.get(itemId, userId);
     }
 
     @GetMapping
     public List<ItemRDto> getItemsListForOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemServiceImpl.getList(userId);
+        return itemService.getList(userId);
     }
 }

@@ -14,36 +14,36 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
-    private final BookingServiceImpl bookingServiceImpl;
+    private final BookingService bookingService;
 
     @PostMapping
     public BookingReturningDto addNewBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @Validated @RequestBody BookingDto bookingDto) {
-        return bookingServiceImpl.save(userId, bookingDto);
+        return bookingService.save(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
     public BookingReturningDto updateBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @PathVariable("bookingId") Long bookingId,
                                              @RequestParam(value = "approved") String approved) {
-        return bookingServiceImpl.update(userId, bookingId, Boolean.parseBoolean(approved));
+        return bookingService.update(userId, bookingId, Boolean.parseBoolean(approved));
     }
 
     @GetMapping("/{bookingId}")
     public BookingReturningDto findById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                         @PathVariable("bookingId") Long bookingId) {
-        return bookingServiceImpl.findById(bookingId, userId);
+        return bookingService.findById(bookingId, userId);
     }
 
     @GetMapping()
     public List<BookingReturningDto> findAllByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                      @RequestParam(value = "state", defaultValue = "ALL") String state) {
-        return bookingServiceImpl.findAllByUserId(userId, state);
+        return bookingService.findAllByUserId(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingReturningDto> findAllForOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId,
                                                      @RequestParam(value = "state", defaultValue = "ALL") String state) {
-        return bookingServiceImpl.findAllForOwner(ownerId, state);
+        return bookingService.findAllForOwner(ownerId, state);
     }
 }

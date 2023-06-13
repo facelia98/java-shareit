@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingReturningDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -34,6 +35,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public BookingReturningDto save(Long userId, BookingDto bookingDto) {
         log.info("POST booking request received to endpoint [/bookings]");
         User user = userRepository.findById(userId).orElseThrow(() -> {
@@ -68,6 +70,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingReturningDto update(Long userId, Long bookingId, boolean approved) {
         log.info("PATCH update statis of booking request received to endpoint [/bookings]");
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Booking not found"));
@@ -89,6 +92,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingReturningDto findById(Long bookingId, Long userId) {
         log.info("GET booking request received to endpoint [/bookings]");
         if (!bookingRepository.existsById(bookingId)) {
@@ -105,6 +109,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingReturningDto> findAllByUserId(Long userId, String state) {
         log.info("GET booking list for owner request received to endpoint [/bookings]");
         if (!userRepository.existsById(userId)) {
@@ -151,6 +156,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingReturningDto> findAllForOwner(Long userId, String state) {
         log.info("GET booking list for owner request received to endpoint [/bookings]");
         if (!userRepository.existsById(userId)) {

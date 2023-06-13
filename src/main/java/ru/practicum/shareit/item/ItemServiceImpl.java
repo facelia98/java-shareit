@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exceptions.AccessDenied;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -31,6 +32,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
 
     @Override
+    @Transactional
     public ItemDto add(ItemDto dto, Long userId) {
         log.info("POST item request received to endpoint [/items]");
         if (!validation(dto)) {
@@ -43,6 +45,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto update(Long userId, Long itemId, ItemDto dto) {
         log.info("PATCH item request received to endpoint [/items] with userId = {}, itemId = {}", userId, itemId);
         Item item = itemRepository.findById(itemId)
@@ -68,6 +71,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemRDto get(Long itemId, Long userId) {
         log.info("GET item request received to endpoint [/items] with itemId = {}", itemId);
         Item item = itemRepository.findById(itemId)
@@ -82,6 +86,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRDto> getList(Long userId) {
         log.info("GET item list request received to endpoint [/items] with userId = {}", userId);
         if (!userRepository.existsById(userId)) {
@@ -103,6 +108,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> search(String query) {
         log.info("GET item list request received to endpoint [/items] with query = {}", query);
         if (query.isBlank()) {
@@ -114,6 +120,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto addNewComment(CommentDto comment, Long userId, Long itemId) {
         log.info("POST comment request received to endpoint [/items]");
         if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, LocalDateTime.now(), Status.REJECTED).isEmpty()) {
