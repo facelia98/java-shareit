@@ -13,8 +13,8 @@ public interface BookingService {
 
     BookingReturningDto findById(Long bookingId, Long userId);
 
-    List<BookingReturningDto> findAllByUserId(Long userId, String state);
+    List<BookingReturningDto> findAllByUserId(Long userId, String state, int from, int size);
 
-    List<BookingReturningDto> findAllForOwner(Long userId, String state);
+    List<BookingReturningDto> findAllForOwner(Long userId, String state, int from, int size);
 
 }

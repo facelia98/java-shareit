@@ -37,8 +37,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam("text") String query) {
-        return itemService.search(query);
+    public List<ItemDto> search(@RequestParam("text") String query,
+                                @RequestParam(value = "from", defaultValue = "0") int from,
+                                @RequestParam(value = "size", defaultValue = "20") int size) {
+        return itemService.search(query, from, size);
     }
 
     @GetMapping("/{id}")
@@ -48,7 +50,9 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemRDto> getItemsListForOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getList(userId);
+    public List<ItemRDto> getItemsListForOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                               @RequestParam(value = "from", defaultValue = "0") int from,
+                                               @RequestParam(value = "size", defaultValue = "20") int size) {
+        return itemService.getList(userId, from, size);
     }
 }

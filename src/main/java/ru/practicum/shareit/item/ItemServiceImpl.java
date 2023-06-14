@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -13,6 +14,7 @@ import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemRDto;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.status.Status;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
@@ -31,6 +33,8 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     @Override
     @Transactional
     public ItemDto add(ItemDto dto, Long userId) {
@@ -41,7 +45,12 @@ public class ItemServiceImpl implements ItemService {
         }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User not found for id = %d", userId)));
-        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(dto, user)));
+        if (dto.getRequestId() == null) {
+            return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(dto, user, null)));
+        }
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(dto, user
+                , itemRequestRepository.findById(dto.getRequestId())
+                        .orElseThrow(() -> new NotFoundException("Request not found")))));
     }
 
     @Override
@@ -87,13 +96,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemRDto> getList(Long userId) {
+    public List<ItemRDto> getList(Long userId, int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("Incorrect Size or Num of first element");
+        }
         log.info("GET item list request received to endpoint [/items] with userId = {}", userId);
         if (!userRepository.existsById(userId)) {
             log.error("User not found for id = {}", userId);
             throw new NotFoundException(String.format("User not found for id = %d", userId));
         }
-        List<Item> items = itemRepository.findAllByOwner_Id(userId);
+        List<Item> items = itemRepository.findAllByOwner_Id(userId, PageRequest.of(from / size, size));
         return items.stream().map(item ->
                         ItemMapper.toItemRDto(item, bookingRepository.findAllForItemId(item.getId()),
                                 commentRepository.findAllByItem_Id(item.getId())))
@@ -109,13 +121,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> search(String query) {
+    public List<ItemDto> search(String query, int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("Incorrect Size or Num of first element");
+        }
         log.info("GET item list request received to endpoint [/items] with query = {}", query);
         if (query.isBlank()) {
             log.warn("Empty query string for searching");
             return Collections.emptyList();
         }
-        return itemRepository.search(query)
+        return itemRepository.search(query, PageRequest.of(from / size, size))
                 .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
