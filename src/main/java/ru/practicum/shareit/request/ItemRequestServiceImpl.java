@@ -9,7 +9,6 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -52,9 +51,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
         return itemRequestRepository.findAllByRequestor_Id(userId).stream()
                 .map(itemRequest ->
-                    ItemRequestMapper.toItemRequestDtoReturned(itemRequest, itemRepository.findAllByRequest_Id(itemRequest.getId())
-                            .stream().map(ItemMapper::toItemDto)
-                            .collect(Collectors.toList()))
+                        ItemRequestMapper.toItemRequestDtoReturned(itemRequest, itemRepository.findAllByRequest_Id(itemRequest.getId())
+                                .stream().map(ItemMapper::toItemDto)
+                                .collect(Collectors.toList()))
                 )
                 .sorted(Comparator.comparing(ItemRequestDtoReturned::getCreated))
                 .collect(Collectors.toList());
