@@ -16,13 +16,18 @@ import org.springframework.web.context.WebApplicationContext;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemRDto;
 import ru.practicum.shareit.user.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -58,6 +63,27 @@ public class ItemControllerTest {
     @BeforeEach
     public void beforeEach(WebApplicationContext webApplicationContext) {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void shouldAddNewComment() throws Exception {
+        LocalDateTime created = LocalDateTime.of(2020, 10, 1, 23, 0, 0);
+
+        CommentDto dto = CommentDto.builder()
+                .id(1L).authorName("Name").created(created).text("Text").build();
+        when(itemService.addNewComment(any(), any(), any())).thenReturn(dto);
+
+        String json = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(post("/items/1/comment")
+                        .contentType(MediaType.APPLICATION_JSON).content(json)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.authorName").value("Name"))
+                .andExpect(jsonPath("$.text").value("Text"))
+                .andExpect(jsonPath("$.created").value("2020-10-01T23:00:00"));
+
     }
 
     @Test
@@ -125,68 +151,28 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.available").value(false))
                 .andExpect(jsonPath("$.comments").isEmpty());
     }
-/*
+
     @Test
-    public void shouldReturnUsersList() throws Exception {
+    public void shouldReturnItemListByOwnerId() throws Exception {
 
-        when(userService.getAll()).thenReturn(List.of(userDto, userDto2, userDto3));
+        User user = User.builder().id(1L).name("Name").email("mail@mail.ru").build();
+        List<ItemRDto> result = List.of(
+                ItemMapper.toItemRDto(
+                        ItemMapper.toItem(itemDto, user, null), List.of(), List.of()),
+                ItemMapper.toItemRDto(
+                        ItemMapper.toItem(itemDto2, user, null), List.of(), List.of()),
+                ItemMapper.toItemRDto(
+                        ItemMapper.toItem(itemDto3, user, null), List.of(), List.of())
+        );
+        when(itemService.getList(any(), anyInt(), anyInt())).thenReturn(result);
 
-        String json2 = objectMapper.writeValueAsString(userDto2);
-        mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON).content(json2)).andReturn();
-
-        String json3 = objectMapper.writeValueAsString(userDto3);
-        mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON).content(json3)).andReturn();
-        mockMvc.perform(get("/users")
+        mockMvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("Name"))
-                .andExpect(jsonPath("$[0].email").value("mail@mail.ru"))
                 .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].name").value("Name2"))
-                .andExpect(jsonPath("$[1].email").value("mail2@mail.ru"))
-                .andExpect(jsonPath("$[2].id").value(3))
-                .andExpect(jsonPath("$[2].name").value("Name3"))
-                .andExpect(jsonPath("$[2].email").value("mail3@mail.ru"));
+                .andExpect(jsonPath("$[2].id").value(3));
     }
-
-    @Test
-    public void shouldReturnUserDtoById() throws Exception {
-        when(userService.get(3L)).thenReturn(userDto3);
-
-        mockMvc.perform(get("/users/{id}", 3)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(3))
-                .andExpect(jsonPath("$.name").value("Name3"))
-                .andExpect(jsonPath("$.email").value("mail3@mail.ru"));
-    }
-
-    @Test
-    public void shouldUpdateUserDto() throws Exception {
-        UserDto userDto4 = userDto3;
-        userDto4.setEmail("kek@kek.ru");
-        String json4 = objectMapper.writeValueAsString(userDto4);
-        when(userService.update(any(), any())).thenReturn(userDto4);
-
-        mockMvc.perform(patch("/users/{id}", 3)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(json4)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(3))
-                .andExpect(jsonPath("$.name").value("Name3"))
-                .andExpect(jsonPath("$.email").value("kek@kek.ru"));
-    }
-
-    @Test
-    public void shouldDeleteUser() throws Exception {
-        mockMvc.perform(delete("/users/{id}", 1))
-                .andExpect(status().isOk());
-    }
-
- */
 }

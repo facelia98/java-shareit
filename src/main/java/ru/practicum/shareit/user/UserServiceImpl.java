@@ -44,11 +44,10 @@ public class UserServiceImpl implements UserService {
         }
         if (dto.getEmail() != null) {
             if (checkEmail(dto.getEmail())) {
-                userRepository.updateByNotNullFields(id, user.getEmail(), user.getName());
+                return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(user)));
             }
         }
-        userRepository.updateByNotNullFields(id, user.getEmail(), user.getName());
-        return user;
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(user)));
     }
 
     @Override
