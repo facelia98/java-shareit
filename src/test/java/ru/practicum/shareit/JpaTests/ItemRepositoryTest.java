@@ -51,19 +51,14 @@ public class ItemRepositoryTest {
 
     @Test
     public void findAllByOwner_IdTestOK() {
-        assertEquals(repository.findAllByOwner_Id(user.getId(), PageRequest.ofSize(2))
-                , List.of(item, item2));
-        assertEquals(repository.findAllByOwner_Id(user.getId(), PageRequest.ofSize(1))
-                , List.of(item));
-        assertEquals(repository.findAllByOwner_Id(user2.getId(), PageRequest.ofSize(1))
-                , List.of());
+        assertEquals(repository.findAllByOwner_Id(user.getId(), PageRequest.ofSize(2)), List.of(item, item2));
+        assertEquals(repository.findAllByOwner_Id(user.getId(), PageRequest.ofSize(1)), List.of(item));
+        assertEquals(repository.findAllByOwner_Id(user2.getId(), PageRequest.ofSize(1)), List.of());
     }
 
     @Test
     public void findAllByRequest_IdTestOK() {
-        assertEquals(repository.findAllByRequest_Id(2L)
-                , List.of());
-        assertEquals(repository.findAllByRequest_Id(request.getId())
-                , List.of(item2));
+        assertEquals(repository.findAllByRequest_Id(2L), List.of());
+        assertEquals(repository.findAllByRequest_Id(request.getId()), List.of(item2));
     }
 }
