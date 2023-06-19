@@ -73,10 +73,10 @@ public class ItemServiceImplTest {
     public void updateItemOK() {
         UserDto u = userService.add(userDto);
         ItemDto savedItemDto = itemService.add(item, u.getId());
-        itemService.update(1L, savedItemDto.getId(),
+        itemService.update(u.getId(), savedItemDto.getId(),
                 ItemDto.builder().description("Updated description").build());
         assertEquals("Updated description",
-                itemService.get(savedItemDto.getId(), 1L).getDescription());
+                itemService.get(savedItemDto.getId(), u.getId()).getDescription());
     }
 
     @Test
