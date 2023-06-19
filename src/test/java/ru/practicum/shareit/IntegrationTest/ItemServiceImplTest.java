@@ -71,8 +71,8 @@ public class ItemServiceImplTest {
 
     @Test
     public void updateItemOK() {
-        userService.add(userDto);
-        ItemDto savedItemDto = itemService.add(item, 1L);
+        UserDto u = userService.add(userDto);
+        ItemDto savedItemDto = itemService.add(item, u.getId());
         itemService.update(1L, savedItemDto.getId(),
                 ItemDto.builder().description("Updated description").build());
         assertEquals("Updated description",

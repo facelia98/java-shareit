@@ -69,9 +69,9 @@ public class UserSeviceImplTest {
 
     @Test
     public void deleteUserOK() {
-        userService.add(userDto);
-        assertNotNull(userService.get(1L));
-        userService.delete(1L);
-        assertThrowsExactly(NotFoundException.class, () -> userService.get(1L));
+        UserDto u = userService.add(userDto);
+        assertNotNull(userService.get(u.getId()));
+        userService.delete(u.getId());
+        assertThrowsExactly(NotFoundException.class, () -> userService.get(u.getId()));
     }
 }
