@@ -16,7 +16,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean isAvailableForBooking(LocalDateTime start, LocalDateTime end, Long itemId);
 
     @Query("select case when ?2 > ?1 AND ?3 < ?1 then true else false end from Booking")
-    boolean checkForBooking(LocalDateTime start, LocalDateTime end, LocalDateTime now);
+    Boolean checkForBooking(LocalDateTime start, LocalDateTime end, LocalDateTime now);
 
     List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId, PageRequest pageRequest);
 

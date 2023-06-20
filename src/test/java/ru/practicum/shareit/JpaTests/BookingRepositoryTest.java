@@ -140,6 +140,12 @@ public class BookingRepositoryTest {
         assertTrue(!repository.isAvailableForBooking(start, start.plusHours(1), item.getId()));
         repository.save(new Booking(1L, item, start, end, user2, Status.APPROVED));
         assertFalse(!repository.isAvailableForBooking(start, start.plusHours(1), item.getId()));
+    }
 
+    @Test
+    public void checkForBookingOK() {
+        Booking booking = repository.save(new Booking(1L, item, LocalDateTime.now(), LocalDateTime.now().plusDays(1), null, Status.WAITING));
+        assertFalse(repository.checkForBooking(LocalDateTime.now().minusWeeks(1),
+                LocalDateTime.now().minusDays(1), LocalDateTime.now()));
     }
 }

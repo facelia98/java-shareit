@@ -28,6 +28,7 @@ public class ItemServiceImplTest {
     ItemDto item = ItemDto.builder().name("Item").description("Desc").available(true).build();
     ItemDto item2 = ItemDto.builder().name("Item2").description("Desc2").available(false).build();
     UserDto userDto = UserDto.builder().id(1L).name("Name").email("mail@mail.ru").build();
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -97,6 +98,23 @@ public class ItemServiceImplTest {
         List<ItemRDto> shouldContainsTwo = itemService.getList(u.getId(), 0, 2);
         assertEquals(1, shouldContainsOne.size());
         assertEquals(2, shouldContainsTwo.size());
+    }
+
+    @Test
+    public void searchEmptyOK() {
+        UserDto u = userService.add(userDto);
+        itemService.add(item, u.getId());
+        itemService.add(item2, u.getId());
+        assertEquals(List.of(), itemService.search(" ", 0, 10));
+    }
+
+    @Test
+    public void searchEXCEPTION() {
+        UserDto u = userService.add(userDto);
+        itemService.add(item, u.getId());
+        itemService.add(item2, u.getId());
+        assertThrowsExactly(ValidationException.class,
+                () -> itemService.search(" ", -1, -1));
     }
 
     @Test
