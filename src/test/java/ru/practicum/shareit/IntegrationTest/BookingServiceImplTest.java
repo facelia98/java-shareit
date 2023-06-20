@@ -110,6 +110,8 @@ public class BookingServiceImplTest {
         assertEquals(1, bookingService.findAllByUserId(user2.getId(), "ALL", 0, 10).size());
         assertEquals(0, bookingService.findAllByUserId(user2.getId(), "PAST", 0, 10).size());
         assertEquals(1, bookingService.findAllByUserId(user2.getId(), "FUTURE", 0, 10).size());
+        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "REJECTED", 0, 10).size());
+        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "CURRENT", 0, 10).size());
 
         assertEquals(0, bookingService.findAllByUserId(user.getId(), "WAITING", 0, 10).size());
         assertEquals(0, bookingService.findAllByUserId(user.getId(), "ALL", 0, 10).size());
@@ -129,6 +131,8 @@ public class BookingServiceImplTest {
         assertEquals(1, bookingService.findAllForOwner(user.getId(), "ALL", 0, 10).size());
         assertEquals(0, bookingService.findAllForOwner(user.getId(), "PAST", 0, 10).size());
         assertEquals(1, bookingService.findAllForOwner(user.getId(), "FUTURE", 0, 10).size());
+        assertEquals(0, bookingService.findAllForOwner(user.getId(), "REJECTED", 0, 10).size());
+        assertEquals(0, bookingService.findAllForOwner(user.getId(), "CURRENT", 0, 10).size());
 
         assertEquals(0, bookingService.findAllForOwner(user2.getId(), "WAITING", 0, 10).size());
         assertEquals(0, bookingService.findAllForOwner(user2.getId(), "ALL", 0, 10).size());

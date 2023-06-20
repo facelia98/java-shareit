@@ -6,11 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ItemRequestMapper {
-    public static ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
-        return new ItemRequestDto(itemRequest.getId(),
-                itemRequest.getDescription(),
-                itemRequest.getRequestor());
-    }
 
     public static ItemRequestDtoReturned toItemRequestDtoReturned(ItemRequest itemRequest, List<ItemDto> items) {
         return new ItemRequestDtoReturned(itemRequest.getId(),
