@@ -85,6 +85,8 @@ public class ItemRequestServiceImplTest {
         itemRequestService.add(itemRequestDto3, u2.getId());
         assertEquals(2, itemRequestService.getAll(u.getId()).size());
         assertEquals(1, itemRequestService.getAll(u2.getId()).size());
+        assertThrowsExactly(NotFoundException.class,
+                () -> itemRequestService.getAll(100L).size());
 
     }
 
@@ -103,5 +105,7 @@ public class ItemRequestServiceImplTest {
         itemRequestService.add(itemRequestDto3, u2.getId());
         assertEquals(1, itemRequestService.getAllFromOthers(u.getId(), 0, 10).size());
         assertEquals(2, itemRequestService.getAllFromOthers(u2.getId(), 0, 10).size());
+        assertThrowsExactly(ValidationException.class,
+                () -> itemRequestService.getAllFromOthers(u2.getId(), -2, -3).size());
     }
 }

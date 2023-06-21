@@ -49,6 +49,7 @@ public class BookingControllerTest {
     Booking booking = new Booking(1L, item, start, end, user, Status.WAITING);
     Booking updatedBooking = new Booking(1L, item, start, end, user, Status.APPROVED);
 
+
     @Autowired
     private MockMvc mockMvc;
 

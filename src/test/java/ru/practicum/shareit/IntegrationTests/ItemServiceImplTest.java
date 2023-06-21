@@ -8,6 +8,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.BookingShort;
 import ru.practicum.shareit.exceptions.AccessDenied;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -34,6 +35,8 @@ public class ItemServiceImplTest {
     ItemDto item2 = ItemDto.builder().name("Item2").description("Desc2").available(false).build();
     UserDto userDto = UserDto.builder().id(1L).name("Name").email("mail@mail.ru").build();
     UserDto userDto2 = UserDto.builder().id(2L).name("Name2").email("mail2@mail.ru").build();
+    BookingShort bookingShort = BookingShort.builder().id(1L).bookerId(1L).build();
+    BookingShort bookingShort2 = BookingShort.builder().id(2L).bookerId(2L).build();
 
     @Autowired
     private UserService userService;

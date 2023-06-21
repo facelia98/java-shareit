@@ -180,7 +180,7 @@ public class BookingServiceImplTest {
         LocalDateTime end = LocalDateTime.now().plusYears(1);
         ItemDto savedItemDto = itemService.add(item, user.getId());
         BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
-        BookingReturningDto booking = bookingService.save(user2.getId(), dto);
+        bookingService.save(user2.getId(), dto);
 
         assertEquals(1, bookingService.findAllByUserId(user2.getId(), "WAITING", 0, 10).size());
         assertEquals(1, bookingService.findAllByUserId(user2.getId(), "ALL", 0, 10).size());
