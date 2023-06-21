@@ -83,7 +83,6 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.authorName").value("Name"))
                 .andExpect(jsonPath("$.text").value("Text"))
                 .andExpect(jsonPath("$.created").value("2020-10-01T23:00:00"));
-
     }
 
     @Test

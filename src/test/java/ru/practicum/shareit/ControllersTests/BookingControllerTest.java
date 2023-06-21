@@ -20,14 +20,10 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.UnsupportedStatus;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.status.Status;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -47,17 +43,11 @@ public class BookingControllerTest {
     private final BookingService bookingService;
 
     Item item = Item.builder().id(1L).name("Item").description("Desc").available(true).build();
-    ItemDto item2 = ItemDto.builder().id(2L).name("Item2").description("Desc2").available(false).build();
     User user = User.builder().id(1L).name("Name").email("mail@mail.ru").build();
-    UserDto userDto2 = UserDto.builder().id(2L).name("Name2").email("mail2@mail.ru").build();
     LocalDateTime start = LocalDateTime.now().plusDays(1);
     LocalDateTime end = LocalDateTime.now().plusDays(2);
     Booking booking = new Booking(1L, item, start, end, user, Status.WAITING);
     Booking updatedBooking = new Booking(1L, item, start, end, user, Status.APPROVED);
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
-
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("uuuu-MM-dd'T'HH:mm:ss");
 
     @Autowired
     private MockMvc mockMvc;

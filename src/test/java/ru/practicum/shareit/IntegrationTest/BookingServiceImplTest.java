@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingReturningDto;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.UnsupportedStatus;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.status.Status;
@@ -94,6 +95,20 @@ public class BookingServiceImplTest {
         BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
         BookingReturningDto booking = bookingService.save(user2.getId(), dto);
         assertThrowsExactly(NotFoundException.class, () -> bookingService.findById(booking.getId(), 10L));
+    }
+
+    @Test
+    void findAllByOwnerEXCEPTION() {
+        UserDto user = userService.add(userDto);
+        assertThrowsExactly(UnsupportedStatus.class, () ->
+                bookingService.findAllForOwner(user.getId(), "KEK", 0, 10));
+    }
+
+    @Test
+    void findAllByUserIdEXCEPTION() {
+        UserDto user = userService.add(userDto);
+        assertThrowsExactly(UnsupportedStatus.class, () ->
+                bookingService.findAllByUserId(user.getId(), "KEK", 0, 10));
     }
 
     @Test
