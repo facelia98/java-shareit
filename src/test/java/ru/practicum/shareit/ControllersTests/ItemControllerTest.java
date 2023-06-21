@@ -71,7 +71,7 @@ public class ItemControllerTest {
 
         CommentDto dto = CommentDto.builder()
                 .id(1L).authorName("Name").created(created).text("Text").build();
-        when(itemService.addNewComment(any(), any(), any())).thenReturn(dto);
+        when(itemService.addNewComment(any(), any(), any(), any())).thenReturn(dto);
 
         String json = objectMapper.writeValueAsString(dto);
 

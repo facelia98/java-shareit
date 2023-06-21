@@ -4,6 +4,7 @@ import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemRDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemService {
@@ -17,5 +18,5 @@ public interface ItemService {
 
     List<ItemDto> search(String query, int from, int size);
 
-    CommentDto addNewComment(CommentDto comment, Long userId, Long itemId);
+    CommentDto addNewComment(CommentDto comment, Long userId, Long itemId, LocalDateTime now);
 }

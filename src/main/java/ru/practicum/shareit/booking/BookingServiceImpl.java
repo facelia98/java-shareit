@@ -47,12 +47,10 @@ public class BookingServiceImpl implements BookingService {
             log.error("Item not found for id = {}", bookingDto.getItemId());
             throw new NotFoundException("Item not found");
         });
-        if (!(bookingRepository.checkForBooking(bookingDto.getStart(),
-                bookingDto.getEnd(), LocalDateTime.now()) == null ? true :
-                bookingRepository.checkForBooking(bookingDto.getStart(),
-                bookingDto.getEnd(), LocalDateTime.now()))) {
-            log.error("Validation failed1");
-            throw new ValidationException("Validation failed1");
+        if (bookingDto.getStart().isAfter(bookingDto.getEnd()) || bookingDto.getStart().isBefore(LocalDateTime.now())
+                || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
+            log.error("Time validation failed");
+            throw new ValidationException("Time validation failed1");
         }
         if (bookingRepository.isAvailableForBooking(bookingDto.getStart(),
                 bookingDto.getEnd(), bookingDto.getItemId())) {

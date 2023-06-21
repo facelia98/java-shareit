@@ -136,7 +136,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public CommentDto addNewComment(CommentDto comment, Long userId, Long itemId) {
+    public CommentDto addNewComment(CommentDto comment, Long userId, Long itemId, LocalDateTime now) {
         log.info("POST comment request received to endpoint [/items]");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -152,7 +152,7 @@ public class ItemServiceImpl implements ItemService {
             log.error("Comment is empty!");
             throw new ValidationException("Blank comment value!");
         }
-        if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, LocalDateTime.now(), Status.REJECTED).isEmpty()) {
+        if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, now, Status.REJECTED).isEmpty()) {
             log.warn("Booking for item_id = {} by user_id = {} is not ended!", itemId, userId);
             throw new ValidationException("Booking is not ended!");
         }

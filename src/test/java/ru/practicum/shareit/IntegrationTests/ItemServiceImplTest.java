@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -165,49 +166,46 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    public void addCommentOK() {
+    public void addCommentOK() throws InterruptedException {
         UserDto user = userService.add(userDto);
         UserDto user2 = userService.add(userDto2);
-        LocalDateTime start = LocalDateTime.now().minusWeeks(1);
-        LocalDateTime end = LocalDateTime.now().minusDays(1);
         ItemDto savedItemDto = itemService.add(item, user.getId());
-        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
-        bookingService.save(user2.getId(), dto);
 
+        bookingService.save(user2.getId(), new BookingDto(null, savedItemDto.getId(),
+                LocalDateTime.now().plusSeconds(1), LocalDateTime.now().plusSeconds(2), Status.WAITING));
+        TimeUnit.SECONDS.sleep(3);
         CommentDto comment = CommentDto.builder().text("Text").build();
-        CommentDto returned = itemService.addNewComment(comment, user2.getId(), savedItemDto.getId());
+        CommentDto returned = itemService.addNewComment(comment, user2.getId(), savedItemDto.getId(), LocalDateTime.now());
         assertEquals(comment.getText(), returned.getText());
         assertEquals(user2.getName(), returned.getAuthorName());
         assertNotNull(returned.getCreated());
     }
 
     @Test
-    public void addCommentEXCEPTIONUserNotFound() {
+    public void addCommentEXCEPTIONUserNotFound() throws InterruptedException {
         UserDto user = userService.add(userDto);
         UserDto user2 = userService.add(userDto2);
-        LocalDateTime start = LocalDateTime.now().minusWeeks(1);
-        LocalDateTime end = LocalDateTime.now().minusDays(1);
         ItemDto savedItemDto = itemService.add(item, user.getId());
-        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
-        bookingService.save(user2.getId(), dto);
 
+        bookingService.save(user2.getId(), new BookingDto(null, savedItemDto.getId(),
+                LocalDateTime.now().plusSeconds(1), LocalDateTime.now().plusSeconds(2), Status.WAITING));
+        TimeUnit.SECONDS.sleep(3);
         CommentDto comment = CommentDto.builder().text("Text").build();
         assertThrowsExactly(NotFoundException.class,
-                () -> itemService.addNewComment(comment, 100L, savedItemDto.getId()));
+                () -> itemService.addNewComment(comment, 100L, savedItemDto.getId(), LocalDateTime.now()));
     }
 
     @Test
-    public void addCommentEXCEPTIONItemNotFound() {
+    public void addCommentEXCEPTIONItemNotFound() throws InterruptedException {
         UserDto user = userService.add(userDto);
         UserDto user2 = userService.add(userDto2);
-        LocalDateTime start = LocalDateTime.now().minusWeeks(1);
-        LocalDateTime end = LocalDateTime.now().minusDays(1);
         ItemDto savedItemDto = itemService.add(item, user.getId());
-        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
-        bookingService.save(user2.getId(), dto);
 
+        bookingService.save(user2.getId(), new BookingDto(null, savedItemDto.getId(),
+                LocalDateTime.now().plusSeconds(1), LocalDateTime.now().plusSeconds(2), Status.WAITING));
+        TimeUnit.SECONDS.sleep(3);
         CommentDto comment = CommentDto.builder().text("Text").build();
         assertThrowsExactly(NotFoundException.class,
-                () -> itemService.addNewComment(comment, user2.getId(), 100L));
+                () -> itemService.addNewComment(comment, user2.getId(), 100L, LocalDateTime.now()));
     }
 }

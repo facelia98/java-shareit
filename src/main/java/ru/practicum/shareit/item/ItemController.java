@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemRDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class ItemController {
     public CommentDto addNewComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                     @RequestBody CommentDto comment,
                                     @PathVariable("itemId") Long itemId) {
-        return itemService.addNewComment(comment, userId, itemId);
+        return itemService.addNewComment(comment, userId, itemId, LocalDateTime.now());
     }
 
     @PostMapping

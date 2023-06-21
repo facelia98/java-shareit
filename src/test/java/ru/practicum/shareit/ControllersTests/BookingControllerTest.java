@@ -77,7 +77,7 @@ public class BookingControllerTest {
     public void shouldAddNewBooking() throws Exception {
         when(bookingService.save(any(), any()))
                 .thenReturn(BookingMapper.toBookingReturningDto(booking));
-        String json = objectMapper.writeValueAsString(booking);
+        String json = "{ \"itemId\": 2, \"start\": \"2020-10-01T23:00:00\", \"end\": \"2020-10-02T23:00:00\" }";
         mockMvc.perform(post("/bookings")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
                         .header("X-Sharer-User-Id", 1))
