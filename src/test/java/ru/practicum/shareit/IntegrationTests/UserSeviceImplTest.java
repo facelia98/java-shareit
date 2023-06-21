@@ -1,4 +1,4 @@
-package ru.practicum.shareit.IntegrationTest;
+package ru.practicum.shareit.IntegrationTests;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.util.List;
 
@@ -90,5 +91,14 @@ public class UserSeviceImplTest {
         assertNotNull(userService.get(u.getId()));
         userService.delete(u.getId());
         assertThrowsExactly(NotFoundException.class, () -> userService.get(u.getId()));
+    }
+
+    @Test
+    public void checkEmailOK() {
+        UserServiceImpl userServiceK = new UserServiceImpl(null);
+        assertTrue(userServiceK.checkEmail("facelia98@mail.ru"));
+        assertThrowsExactly(ValidationException.class, () -> userServiceK.checkEmail(" "));
+        assertThrowsExactly(ValidationException.class, () -> userServiceK.checkEmail(""));
+        assertThrowsExactly(ValidationException.class, () -> userServiceK.checkEmail("facelia98"));
     }
 }
