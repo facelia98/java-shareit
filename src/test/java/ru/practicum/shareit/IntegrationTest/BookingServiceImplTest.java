@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingReturningDto;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.UnsupportedStatus;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.status.Status;
@@ -40,6 +41,30 @@ public class BookingServiceImplTest {
     private BookingService bookingService;
 
     @Test
+    void addBookingEXCEPTIONValidation() {
+        UserDto user = userService.add(userDto);
+        UserDto user2 = userService.add(userDto2);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusYears(1);
+        ItemDto savedItemDto = itemService.add(item2, user.getId());
+        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
+        assertThrowsExactly(ValidationException.class,
+                () -> bookingService.save(user2.getId(), dto));
+    }
+
+    @Test
+    void addBookingEXCEPTIONValidationOwner() {
+        UserDto user = userService.add(userDto);
+        UserDto user2 = userService.add(userDto2);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusYears(1);
+        ItemDto savedItemDto = itemService.add(item, user.getId());
+        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
+        assertThrowsExactly(NotFoundException.class,
+                () -> bookingService.save(user.getId(), dto));
+    }
+
+    @Test
     void addBookingOK() {
         UserDto user = userService.add(userDto);
         UserDto user2 = userService.add(userDto2);
@@ -53,6 +78,25 @@ public class BookingServiceImplTest {
         assertEquals(dto.getEnd(), booking.getEnd());
         assertEquals(dto.getItemId(), booking.getItem().getId());
         assertEquals(Status.WAITING, booking.getStatus());
+    }
+
+    @Test
+    void addBookingEXCEPTIONNotFoundUser() {
+        UserDto user = userService.add(userDto);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusYears(1);
+        ItemDto savedItemDto = itemService.add(item, user.getId());
+        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
+        assertThrowsExactly(NotFoundException.class, () -> bookingService.save(100L, dto));
+    }
+
+    @Test
+    void addBookingEXCEPTIONNotFoundItem() {
+        UserDto user = userService.add(userDto);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusYears(1);
+        BookingDto dto = new BookingDto(null, 10L, start, end, Status.WAITING);
+        assertThrowsExactly(NotFoundException.class, () -> bookingService.save(user.getId(), dto));
     }
 
     @Test
