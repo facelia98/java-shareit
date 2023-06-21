@@ -41,6 +41,17 @@ public class UserSeviceImplTest {
     }
 
     @Test
+    public void updateUserOKWithoutEmail() {
+        UserDto savedUserDto = userService.add(userDto2);
+        userDto2.setEmail(null);
+        userDto2.setName("NewName");
+        userService.update(savedUserDto.getId(), userDto2);
+        UserDto updatedUserDto = userService.get(savedUserDto.getId());
+        assertEquals(userDto2.getName(), updatedUserDto.getName());
+        assertEquals("mail2@mail.ru", updatedUserDto.getEmail());
+    }
+
+    @Test
     public void updateUserOK() {
         UserDto savedUserDto = userService.add(userDto2);
         userDto2.setEmail("newEmail@mail.ru");
