@@ -27,6 +27,12 @@ public class UserSeviceImplTest {
     private UserService userService;
 
     @Test
+    public void addUserEXCEPTION() {
+        UserDto dto = UserDto.builder().id(3L).name("Name3").build();
+        assertThrowsExactly(ValidationException.class, () -> userService.add(dto));
+    }
+
+    @Test
     public void addUserOK() {
         UserDto savedUserDto = userService.add(userDto);
         assertNotNull(savedUserDto.getId());

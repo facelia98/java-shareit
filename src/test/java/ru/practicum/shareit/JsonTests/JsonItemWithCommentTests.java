@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.test.json.ObjectContent;
-import ru.practicum.shareit.booking.model.BookingShort;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemRDto;
@@ -61,8 +60,8 @@ public class JsonItemWithCommentTests {
         ItemRDto dto = ItemRDto.builder()
                 .id(1L).description("Описание")
                 .name("Название")
-                .lastBooking(BookingShort.builder().bookerId(10L).id(12L).build())
-                .nextBooking(BookingShort.builder().bookerId(3L).id(8L).build())
+                .lastBooking(null)
+                .nextBooking(null)
                 .comments(List.of(CommentDto.builder().created(created).authorName("Имя").text("Текст").build()))
                 .build();
         JsonContent<ItemRDto> result = jsonItemR.write(dto);
@@ -70,8 +69,8 @@ public class JsonItemWithCommentTests {
         // has correct fields, null value in dates of bookings
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.description").isEqualTo("Описание");
-        assertThat(result).extractingJsonPathValue("$.nextBooking").isNotNull();
-        assertThat(result).extractingJsonPathValue("$.lastBooking").isNotNull();
+        assertThat(result).extractingJsonPathValue("$.nextBooking").isNull();
+        assertThat(result).extractingJsonPathValue("$.lastBooking").isNull();
         assertThat(result).extractingJsonPathValue("$.comments[0].created").isEqualTo("2020-10-01T23:00:00");
         assertThat(result).extractingJsonPathValue("$.comments[0].text").isEqualTo("Текст");
     }

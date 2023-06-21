@@ -138,10 +138,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public CommentDto addNewComment(CommentDto comment, Long userId, Long itemId) {
         log.info("POST comment request received to endpoint [/items]");
-        if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, LocalDateTime.now(), Status.REJECTED).isEmpty()) {
-            log.warn("Booking for item_id = {} by user_id = {} is not ended!", itemId, userId);
-            throw new ValidationException("Booking is not ended!");
-        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("User not found exception for id = {}", userId);
@@ -155,6 +151,10 @@ public class ItemServiceImpl implements ItemService {
         if (comment.getText().isBlank()) {
             log.error("Comment is empty!");
             throw new ValidationException("Blank comment value!");
+        }
+        if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, LocalDateTime.now(), Status.REJECTED).isEmpty()) {
+            log.warn("Booking for item_id = {} by user_id = {} is not ended!", itemId, userId);
+            throw new ValidationException("Booking is not ended!");
         }
         return CommentMapper.toCommentDto(
                 commentRepository.save(CommentMapper.toComment(comment, user, item, LocalDateTime.now())));

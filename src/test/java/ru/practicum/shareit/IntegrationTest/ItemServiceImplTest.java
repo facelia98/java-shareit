@@ -84,9 +84,18 @@ public class ItemServiceImplTest {
         UserDto u = userService.add(userDto);
         ItemDto savedItemDto = itemService.add(item, u.getId());
         itemService.update(u.getId(), savedItemDto.getId(),
-                ItemDto.builder().description("Updated description").build());
+                ItemDto.builder().description("Updated description").name("Updated name")
+                        .available(true).build());
         assertEquals("Updated description",
                 itemService.get(savedItemDto.getId(), u.getId()).getDescription());
+    }
+
+    @Test
+    public void updateItemEXCEPTIONNotFound() {
+        UserDto u = userService.add(userDto);
+        assertThrowsExactly(NotFoundException.class,
+                () -> itemService.update(2L, 10L,
+                        ItemDto.builder().description(null).build()));
     }
 
     @Test
@@ -96,6 +105,21 @@ public class ItemServiceImplTest {
         assertThrowsExactly(AccessDenied.class,
                 () -> itemService.update(2L, savedItemDto.getId(),
                         ItemDto.builder().description(null).build()));
+    }
+
+    @Test
+    public void getListEXCEPTION() {
+        assertThrowsExactly(NotFoundException.class,
+                () -> itemService.getList(10L, 0, 1));
+    }
+
+    @Test
+    public void getListEXCEPTIONPagination() {
+        UserDto u = userService.add(userDto);
+        itemService.add(item, u.getId());
+        itemService.add(item2, u.getId());
+        assertThrowsExactly(ValidationException.class,
+                () -> itemService.getList(u.getId(), -1, -1));
     }
 
     @Test
@@ -138,12 +162,6 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    public void addCommentEXCEPTION() {
-        CommentDto dto = CommentDto.builder().text("Text").authorName("Name").created(LocalDateTime.now()).build();
-        assertThrowsExactly(ValidationException.class, () -> itemService.addNewComment(dto, 1L, 1L));
-    }
-
-    @Test
     public void addCommentOK() {
         UserDto user = userService.add(userDto);
         UserDto user2 = userService.add(userDto2);
@@ -158,5 +176,35 @@ public class ItemServiceImplTest {
         assertEquals(comment.getText(), returned.getText());
         assertEquals(user2.getName(), returned.getAuthorName());
         assertNotNull(returned.getCreated());
+    }
+
+    @Test
+    public void addCommentEXCEPTIONUserNotFound() {
+        UserDto user = userService.add(userDto);
+        UserDto user2 = userService.add(userDto2);
+        LocalDateTime start = LocalDateTime.now().minusWeeks(1);
+        LocalDateTime end = LocalDateTime.now().minusDays(1);
+        ItemDto savedItemDto = itemService.add(item, user.getId());
+        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
+        bookingService.save(user2.getId(), dto);
+
+        CommentDto comment = CommentDto.builder().text("Text").build();
+        assertThrowsExactly(NotFoundException.class,
+                () -> itemService.addNewComment(comment, 100L, savedItemDto.getId()));
+    }
+
+    @Test
+    public void addCommentEXCEPTIONItemNotFound() {
+        UserDto user = userService.add(userDto);
+        UserDto user2 = userService.add(userDto2);
+        LocalDateTime start = LocalDateTime.now().minusWeeks(1);
+        LocalDateTime end = LocalDateTime.now().minusDays(1);
+        ItemDto savedItemDto = itemService.add(item, user.getId());
+        BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
+        bookingService.save(user2.getId(), dto);
+
+        CommentDto comment = CommentDto.builder().text("Text").build();
+        assertThrowsExactly(NotFoundException.class,
+                () -> itemService.addNewComment(comment, user2.getId(), 100L));
     }
 }

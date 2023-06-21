@@ -130,6 +130,11 @@ public class BookingServiceImplTest {
     }
 
     @Test
+    void getByIdEXCEPTIONNotFound() {
+        assertThrowsExactly(NotFoundException.class, () -> bookingService.findById(10L, 10L));
+    }
+
+    @Test
     void getByIdEXCEPTION() {
         UserDto user = userService.add(userDto);
         UserDto user2 = userService.add(userDto2);
@@ -146,6 +151,18 @@ public class BookingServiceImplTest {
         UserDto user = userService.add(userDto);
         assertThrowsExactly(UnsupportedStatus.class, () ->
                 bookingService.findAllForOwner(user.getId(), "KEK", 0, 10));
+    }
+
+    @Test
+    void findAllByOwnerEXCEPTIONUser() {
+        assertThrowsExactly(NotFoundException.class, () ->
+                bookingService.findAllForOwner(100L, "ALL", 0, 10));
+    }
+
+    @Test
+    void findAllByUserIdEXCEPTIONUser() {
+        assertThrowsExactly(NotFoundException.class, () ->
+                bookingService.findAllByUserId(100L, "ALL", 0, 10));
     }
 
     @Test
