@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingService;
@@ -150,26 +151,26 @@ public class BookingServiceImplTest {
     void findAllByOwnerEXCEPTION() {
         UserDto user = userService.add(userDto);
         assertThrowsExactly(UnsupportedStatus.class, () ->
-                bookingService.findAllForOwner(user.getId(), "KEK", 0, 10));
+                bookingService.findAllForOwner(user.getId(), "KEK", PageRequest.of(0, 10)));
     }
 
     @Test
     void findAllByOwnerEXCEPTIONUser() {
         assertThrowsExactly(NotFoundException.class, () ->
-                bookingService.findAllForOwner(100L, "ALL", 0, 10));
+                bookingService.findAllForOwner(100L, "ALL", PageRequest.of(0, 10)));
     }
 
     @Test
     void findAllByUserIdEXCEPTIONUser() {
         assertThrowsExactly(NotFoundException.class, () ->
-                bookingService.findAllByUserId(100L, "ALL", 0, 10));
+                bookingService.findAllByUserId(100L, "ALL", PageRequest.of(0, 10)));
     }
 
     @Test
     void findAllByUserIdEXCEPTION() {
         UserDto user = userService.add(userDto);
         assertThrowsExactly(UnsupportedStatus.class, () ->
-                bookingService.findAllByUserId(user.getId(), "KEK", 0, 10));
+                bookingService.findAllByUserId(user.getId(), "KEK", PageRequest.of(0, 10)));
     }
 
     @Test
@@ -182,15 +183,15 @@ public class BookingServiceImplTest {
         BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
         bookingService.save(user2.getId(), dto);
 
-        assertEquals(1, bookingService.findAllByUserId(user2.getId(), "WAITING", 0, 10).size());
-        assertEquals(1, bookingService.findAllByUserId(user2.getId(), "ALL", 0, 10).size());
-        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "PAST", 0, 10).size());
-        assertEquals(1, bookingService.findAllByUserId(user2.getId(), "FUTURE", 0, 10).size());
-        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "REJECTED", 0, 10).size());
-        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "CURRENT", 0, 10).size());
+        assertEquals(1, bookingService.findAllByUserId(user2.getId(), "WAITING", PageRequest.of(0, 10)).size());
+        assertEquals(1, bookingService.findAllByUserId(user2.getId(), "ALL", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "PAST", PageRequest.of(0, 10)).size());
+        assertEquals(1, bookingService.findAllByUserId(user2.getId(), "FUTURE", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "REJECTED", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllByUserId(user2.getId(), "CURRENT", PageRequest.of(0, 10)).size());
 
-        assertEquals(0, bookingService.findAllByUserId(user.getId(), "WAITING", 0, 10).size());
-        assertEquals(0, bookingService.findAllByUserId(user.getId(), "ALL", 0, 10).size());
+        assertEquals(0, bookingService.findAllByUserId(user.getId(), "WAITING", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllByUserId(user.getId(), "ALL", PageRequest.of(0, 10)).size());
     }
 
     @Test
@@ -203,14 +204,14 @@ public class BookingServiceImplTest {
         BookingDto dto = new BookingDto(null, savedItemDto.getId(), start, end, Status.WAITING);
         BookingReturningDto booking = bookingService.save(user2.getId(), dto);
 
-        assertEquals(1, bookingService.findAllForOwner(user.getId(), "WAITING", 0, 10).size());
-        assertEquals(1, bookingService.findAllForOwner(user.getId(), "ALL", 0, 10).size());
-        assertEquals(0, bookingService.findAllForOwner(user.getId(), "PAST", 0, 10).size());
-        assertEquals(1, bookingService.findAllForOwner(user.getId(), "FUTURE", 0, 10).size());
-        assertEquals(0, bookingService.findAllForOwner(user.getId(), "REJECTED", 0, 10).size());
-        assertEquals(0, bookingService.findAllForOwner(user.getId(), "CURRENT", 0, 10).size());
+        assertEquals(1, bookingService.findAllForOwner(user.getId(), "WAITING", PageRequest.of(0, 10)).size());
+        assertEquals(1, bookingService.findAllForOwner(user.getId(), "ALL", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllForOwner(user.getId(), "PAST", PageRequest.of(0, 10)).size());
+        assertEquals(1, bookingService.findAllForOwner(user.getId(), "FUTURE", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllForOwner(user.getId(), "REJECTED", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllForOwner(user.getId(), "CURRENT", PageRequest.of(0, 10)).size());
 
-        assertEquals(0, bookingService.findAllForOwner(user2.getId(), "WAITING", 0, 10).size());
-        assertEquals(0, bookingService.findAllForOwner(user2.getId(), "ALL", 0, 10).size());
+        assertEquals(0, bookingService.findAllForOwner(user2.getId(), "WAITING", PageRequest.of(0, 10)).size());
+        assertEquals(0, bookingService.findAllForOwner(user2.getId(), "ALL", PageRequest.of(0, 10)).size());
     }
 }

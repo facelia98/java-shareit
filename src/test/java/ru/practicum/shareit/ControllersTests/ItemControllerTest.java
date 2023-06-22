@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -27,7 +28,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -71,7 +71,7 @@ public class ItemControllerTest {
 
         CommentDto dto = CommentDto.builder()
                 .id(1L).authorName("Name").created(created).text("Text").build();
-        when(itemService.addNewComment(any(), any(), any(), any())).thenReturn(dto);
+        when(itemService.addNewComment(any(), any(), any())).thenReturn(dto);
 
         String json = objectMapper.writeValueAsString(dto);
 
@@ -117,7 +117,7 @@ public class ItemControllerTest {
 
     @Test
     public void shouldSearch() throws Exception {
-        when(itemService.search("Name", 0, 10)).thenReturn(List.of(itemDto));
+        when(itemService.search("Name", PageRequest.of(0, 10))).thenReturn(List.of(itemDto));
         String json = objectMapper.writeValueAsString(List.of(itemDto));
         mockMvc.perform(get("/items/search?text=Name&from=0&size=10")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
@@ -163,7 +163,7 @@ public class ItemControllerTest {
                 ItemMapper.toItemRDto(
                         ItemMapper.toItem(itemDto3, user, null), List.of(), List.of())
         );
-        when(itemService.getList(any(), anyInt(), anyInt())).thenReturn(result);
+        when(itemService.getList(any(), any())).thenReturn(result);
 
         mockMvc.perform(get("/items")
                         .header("X-Sharer-User-Id", 1)

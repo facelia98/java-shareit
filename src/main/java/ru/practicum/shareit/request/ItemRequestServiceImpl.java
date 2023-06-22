@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
@@ -29,16 +28,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public ItemRequestDtoReturned add(ItemRequestDto dto, Long userId) {
         log.info("POST itemRequest request received to endpoint [/requests]");
-        if (dto.getDescription().isBlank()) {
-            throw new ValidationException("Empty description!");
-        }
         User user = userRepository.findById(userId).orElseThrow(() -> {
             log.error("User not found for id = {}", userId);
             throw new NotFoundException(String.format("User not found exception for id = %d", userId));
         });
-        dto.setRequestor(user);
         return ItemRequestMapper.toItemRequestDtoReturned(
-                itemRequestRepository.save(ItemRequestMapper.toItemRequest(dto)), null);
+                itemRequestRepository.save(ItemRequestMapper.toItemRequest(dto, user)), null);
     }
 
     @Override
@@ -61,11 +56,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemRequestDtoReturned> getAllFromOthers(Long requestor, int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Incorrect Size or Num of first element");
-        }
-        return itemRequestRepository.findAllByRequestor_IdNot(requestor, PageRequest.of(from / size, size)).stream()
+    public List<ItemRequestDtoReturned> getAllFromOthers(Long requestor, PageRequest pageRequest) {
+        return itemRequestRepository.findAllByRequestor_IdNot(requestor, pageRequest).stream()
                 .map(itemRequest ->
                         ItemRequestMapper.toItemRequestDtoReturned(itemRequest, itemRepository.findAllByRequest_Id(itemRequest.getId())
                                 .stream().map(ItemMapper::toItemDto)
@@ -76,6 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional
     public ItemRequestDtoReturned get(Long id, Long userId) {
         if (!userRepository.existsById(userId)) {
             log.error("User not found for id = {}", userId);

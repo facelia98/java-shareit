@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.request.ItemRequestDto;
 import ru.practicum.shareit.request.ItemRequestDtoReturned;
 import ru.practicum.shareit.request.ItemRequestService;
@@ -49,13 +49,6 @@ public class ItemRequestServiceImplTest {
         ItemRequestDto itemRequestDto =
                 ItemRequestDto.builder().description("Ручка").build();
         assertThrowsExactly(NotFoundException.class, () -> itemRequestService.add(itemRequestDto, 2L));
-    }
-
-    @Test
-    void addRequestEXCEPTION_400() {
-        ItemRequestDto itemRequestDto =
-                ItemRequestDto.builder().description(" ").build();
-        assertThrowsExactly(ValidationException.class, () -> itemRequestService.add(itemRequestDto, 2L));
     }
 
     @Test
@@ -103,9 +96,7 @@ public class ItemRequestServiceImplTest {
         itemRequestService.add(itemRequestDto, u.getId());
         itemRequestService.add(itemRequestDto2, u.getId());
         itemRequestService.add(itemRequestDto3, u2.getId());
-        assertEquals(1, itemRequestService.getAllFromOthers(u.getId(), 0, 10).size());
-        assertEquals(2, itemRequestService.getAllFromOthers(u2.getId(), 0, 10).size());
-        assertThrowsExactly(ValidationException.class,
-                () -> itemRequestService.getAllFromOthers(u2.getId(), -2, -3).size());
+        assertEquals(1, itemRequestService.getAllFromOthers(u.getId(), PageRequest.of(0, 10)).size());
+        assertEquals(2, itemRequestService.getAllFromOthers(u2.getId(), PageRequest.of(0, 10)).size());
     }
 }

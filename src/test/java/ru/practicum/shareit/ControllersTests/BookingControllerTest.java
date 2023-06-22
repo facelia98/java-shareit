@@ -102,7 +102,7 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnAllForUserBooking404() throws Exception {
-        when(bookingService.findAllByUserId(anyLong(), anyString(), anyInt(), anyInt()))
+        when(bookingService.findAllByUserId(anyLong(), anyString(), any()))
                 .thenThrow(NotFoundException.class);
         mockMvc.perform(get("/bookings/state=ALL&from=1&size=10")
                         .header("X-Sharer-User-Id", 100))
@@ -111,7 +111,7 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnAllForUserBooking4xx() throws Exception {
-        when(bookingService.findAllByUserId(anyLong(), anyString(), anyInt(), anyInt()))
+        when(bookingService.findAllByUserId(anyLong(), anyString(), any()))
                 .thenThrow(ValidationException.class);
         mockMvc.perform(get("/bookings/state=ALL&from=-1&size=10")
                         .header("X-Sharer-User-Id", 1))
@@ -120,7 +120,7 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnAllForOwnerBooking4xx() throws Exception {
-        when(bookingService.findAllForOwner(anyLong(), anyString(), anyInt(), anyInt()))
+        when(bookingService.findAllForOwner(anyLong(), anyString(), any()))
                 .thenThrow(UnsupportedStatus.class);
         mockMvc.perform(get("/bookings/owner?state=KEK&from=0&size=10")
                         .header("X-Sharer-User-Id", 1))
@@ -129,7 +129,7 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnAllForOwnerBooking() throws Exception {
-        when(bookingService.findAllForOwner(anyLong(), anyString(), anyInt(), anyInt()))
+        when(bookingService.findAllForOwner(anyLong(), anyString(), any()))
                 .thenReturn(List.of(BookingMapper.toBookingReturningDto(booking)));
         mockMvc.perform(get("/bookings/owner?state=ALL&from=0&size=10")
                         .header("X-Sharer-User-Id", 1))
@@ -144,7 +144,7 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnAllForUserBooking() throws Exception {
-        when(bookingService.findAllByUserId(anyLong(), anyString(), anyInt(), anyInt()))
+        when(bookingService.findAllByUserId(anyLong(), anyString(), any()))
                 .thenReturn(List.of(BookingMapper.toBookingReturningDto(booking)));
         mockMvc.perform(get("/bookings?state=ALL&from=0&size=10")
                         .header("X-Sharer-User-Id", 1))

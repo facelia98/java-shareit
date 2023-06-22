@@ -1,5 +1,6 @@
 package ru.practicum.shareit.JpaTests;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,15 @@ public class BookingRepositoryTest {
         item = itemRepository.save(Item.builder().name("Item").owner(user).description("Desc").available(true).build());
         item2 = itemRepository.save(Item.builder().name("Item2").owner(user).description("Desc2").available(false).build());
     }
+
+    @AfterEach
+    void afterEach() {
+        userRepository.delete(user);
+        userRepository.delete(user2);
+        itemRepository.delete(item);
+        itemRepository.delete(item2);
+    }
+
 
     @Test
     public void findAllForItemIdTestOK() {

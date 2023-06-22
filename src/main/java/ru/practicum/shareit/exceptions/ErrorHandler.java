@@ -25,4 +25,10 @@ public class ErrorHandler {
     public ErrorResponse handleMethodArgumentNotValidError(final UnsupportedStatus e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValueValidationError(final IllegalArgumentException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }

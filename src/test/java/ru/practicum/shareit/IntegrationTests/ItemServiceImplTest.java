@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingService;
@@ -114,16 +115,7 @@ public class ItemServiceImplTest {
     @Test
     public void getListEXCEPTION() {
         assertThrowsExactly(NotFoundException.class,
-                () -> itemService.getList(10L, 0, 1));
-    }
-
-    @Test
-    public void getListEXCEPTIONPagination() {
-        UserDto u = userService.add(userDto);
-        itemService.add(item, u.getId());
-        itemService.add(item2, u.getId());
-        assertThrowsExactly(ValidationException.class,
-                () -> itemService.getList(u.getId(), -1, -1));
+                () -> itemService.getList(10L, PageRequest.of(0, 2)));
     }
 
     @Test
@@ -131,8 +123,8 @@ public class ItemServiceImplTest {
         UserDto u = userService.add(userDto);
         itemService.add(item, u.getId());
         itemService.add(item2, u.getId());
-        List<ItemRDto> shouldContainsOne = itemService.getList(u.getId(), 1, 1);
-        List<ItemRDto> shouldContainsTwo = itemService.getList(u.getId(), 0, 2);
+        List<ItemRDto> shouldContainsOne = itemService.getList(u.getId(), PageRequest.of(1, 1));
+        List<ItemRDto> shouldContainsTwo = itemService.getList(u.getId(), PageRequest.of(0, 2));
         assertEquals(1, shouldContainsOne.size());
         assertEquals(2, shouldContainsTwo.size());
     }
@@ -142,16 +134,7 @@ public class ItemServiceImplTest {
         UserDto u = userService.add(userDto);
         itemService.add(item, u.getId());
         itemService.add(item2, u.getId());
-        assertEquals(List.of(), itemService.search(" ", 0, 10));
-    }
-
-    @Test
-    public void searchEXCEPTION() {
-        UserDto u = userService.add(userDto);
-        itemService.add(item, u.getId());
-        itemService.add(item2, u.getId());
-        assertThrowsExactly(ValidationException.class,
-                () -> itemService.search(" ", -1, -1));
+        assertEquals(List.of(), itemService.search(" ", PageRequest.of(0, 10)));
     }
 
     @Test
@@ -159,9 +142,9 @@ public class ItemServiceImplTest {
         UserDto u = userService.add(userDto);
         itemService.add(item, u.getId());
         itemService.add(item2, u.getId());
-        List<ItemDto> shouldContainsOne = itemService.search("Item", 0, 10);
+        List<ItemDto> shouldContainsOne = itemService.search("Item", PageRequest.of(0, 10));
         assertEquals(1, shouldContainsOne.size());
-        List<ItemDto> shouldNotContains = itemService.search("kek", 0, 10);
+        List<ItemDto> shouldNotContains = itemService.search("kek", PageRequest.of(0, 10));
         assertEquals(0, shouldNotContains.size());
     }
 
@@ -175,7 +158,7 @@ public class ItemServiceImplTest {
                 LocalDateTime.now().plusSeconds(1), LocalDateTime.now().plusSeconds(2), Status.WAITING));
         TimeUnit.SECONDS.sleep(3);
         CommentDto comment = CommentDto.builder().text("Text").build();
-        CommentDto returned = itemService.addNewComment(comment, user2.getId(), savedItemDto.getId(), LocalDateTime.now());
+        CommentDto returned = itemService.addNewComment(comment, user2.getId(), savedItemDto.getId());
         assertEquals(comment.getText(), returned.getText());
         assertEquals(user2.getName(), returned.getAuthorName());
         assertNotNull(returned.getCreated());
@@ -192,7 +175,7 @@ public class ItemServiceImplTest {
         TimeUnit.SECONDS.sleep(3);
         CommentDto comment = CommentDto.builder().text("Text").build();
         assertThrowsExactly(NotFoundException.class,
-                () -> itemService.addNewComment(comment, 100L, savedItemDto.getId(), LocalDateTime.now()));
+                () -> itemService.addNewComment(comment, 100L, savedItemDto.getId()));
     }
 
     @Test
@@ -206,6 +189,6 @@ public class ItemServiceImplTest {
         TimeUnit.SECONDS.sleep(3);
         CommentDto comment = CommentDto.builder().text("Text").build();
         assertThrowsExactly(NotFoundException.class,
-                () -> itemService.addNewComment(comment, user2.getId(), 100L, LocalDateTime.now()));
+                () -> itemService.addNewComment(comment, user2.getId(), 100L));
     }
 }

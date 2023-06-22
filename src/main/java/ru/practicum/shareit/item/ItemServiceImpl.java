@@ -32,7 +32,6 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
-
     private final ItemRequestRepository itemRequestRepository;
 
     @Override
@@ -96,16 +95,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemRDto> getList(Long userId, int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Incorrect Size or Num of first element");
-        }
+    public List<ItemRDto> getList(Long userId, PageRequest pageRequest) {
         log.info("GET item list request received to endpoint [/items] with userId = {}", userId);
         if (!userRepository.existsById(userId)) {
             log.error("User not found for id = {}", userId);
             throw new NotFoundException(String.format("User not found for id = %d", userId));
         }
-        List<Item> items = itemRepository.findAllByOwner_Id(userId, PageRequest.of(from / size, size));
+        List<Item> items = itemRepository.findAllByOwner_Id(userId, pageRequest);
         return items.stream().map(item ->
                         ItemMapper.toItemRDto(item, bookingRepository.findAllForItemId(item.getId()),
                                 commentRepository.findAllByItem_Id(item.getId())))
@@ -121,22 +117,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> search(String query, int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Incorrect Size or Num of first element");
-        }
+    public List<ItemDto> search(String query, PageRequest pageRequest) {
         log.info("GET item list request received to endpoint [/items] with query = {}", query);
         if (query.isBlank()) {
             log.warn("Empty query string for searching");
             return Collections.emptyList();
         }
-        return itemRepository.search(query, PageRequest.of(from / size, size))
+        return itemRepository.search(query, pageRequest)
                 .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public CommentDto addNewComment(CommentDto comment, Long userId, Long itemId, LocalDateTime now) {
+    public CommentDto addNewComment(CommentDto comment, Long userId, Long itemId) {
         log.info("POST comment request received to endpoint [/items]");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -152,7 +145,7 @@ public class ItemServiceImpl implements ItemService {
             log.error("Comment is empty!");
             throw new ValidationException("Blank comment value!");
         }
-        if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, now, Status.REJECTED).isEmpty()) {
+        if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, LocalDateTime.now(), Status.REJECTED).isEmpty()) {
             log.warn("Booking for item_id = {} by user_id = {} is not ended!", itemId, userId);
             throw new ValidationException("Booking is not ended!");
         }

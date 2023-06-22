@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -56,7 +55,7 @@ public class ItemRequestControllerTest {
     public void shouldReturnItemRequestListForOthers() throws Exception {
         ItemRequestDtoReturned returned = ItemRequestMapper.toItemRequestDtoReturned(itemRequest, List.of());
         ItemRequestDtoReturned returned2 = ItemRequestMapper.toItemRequestDtoReturned(itemRequest2, List.of());
-        when(itemRequestService.getAllFromOthers(any(), anyInt(), anyInt())).thenReturn(List.of(returned, returned2));
+        when(itemRequestService.getAllFromOthers(any(), any())).thenReturn(List.of(returned, returned2));
 
         String json = objectMapper.writeValueAsString(List.of(returned, returned2));
 
