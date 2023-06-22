@@ -112,9 +112,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public List<BookingReturningDto> findAllByUserId(Long userId, String state, PageRequest pageRequest) {
-         /*if (from < 0 || size <= 0) {
-            throw new ValidationException("Incorrect Size or Num of first element");
-        }*/
         log.info("GET booking list for owner request received to endpoint [/bookings]");
         if (!userRepository.existsById(userId)) {
             log.error("Booking not found for user/owner_id = {}", userId);
@@ -162,9 +159,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public List<BookingReturningDto> findAllForOwner(Long userId, String state, PageRequest pageRequest) {
-        /*if (from < 0 || size <= 0) {
-            throw new ValidationException("Incorrect Size or Num of first element");
-        }*/
         log.info("GET booking list for owner request received to endpoint [/bookings]");
         if (!userRepository.existsById(userId)) {
             log.error("Not found user for id = {}", userId);
