@@ -23,7 +23,6 @@ public class JsonItemWithCommentTests {
     @Autowired
     private JacksonTester<ItemRDto> jsonItemR;
 
-
     @Test
     void testItemDtoIncoming() throws Exception {
         // test that incoming dto has correct field
