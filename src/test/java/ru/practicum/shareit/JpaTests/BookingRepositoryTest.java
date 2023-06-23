@@ -43,10 +43,8 @@ public class BookingRepositoryTest {
 
     @AfterEach
     void afterEach() {
-        userRepository.delete(user);
-        userRepository.delete(user2);
-        itemRepository.delete(item);
-        itemRepository.delete(item2);
+        userRepository.deleteAll();
+        itemRepository.deleteAll();
     }
 
 
