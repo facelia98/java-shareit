@@ -21,10 +21,7 @@ public class UserServiceImpl implements UserService {
     public UserDto add(UserDto dto) {
         log.info("POST user request received to endpoint [/users]");
         if (userValidate(dto)) {
-            if (checkEmail(dto.getEmail())) {
-                return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(dto)));
-            }
-            return null;
+            return checkEmail(dto.getEmail()) ? UserMapper.toUserDto(userRepository.save(UserMapper.toUser(dto))) : null;
         } else {
             log.error("User validation exception");
             throw new ValidationException("UserDTO validation exception");
@@ -44,11 +41,10 @@ public class UserServiceImpl implements UserService {
         }
         if (dto.getEmail() != null) {
             if (checkEmail(dto.getEmail())) {
-                userRepository.updateByNotNullFields(id, user.getEmail(), user.getName());
+                return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(user)));
             }
         }
-        userRepository.updateByNotNullFields(id, user.getEmail(), user.getName());
-        return user;
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(user)));
     }
 
     @Override

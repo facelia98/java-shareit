@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS requests
     id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY not null,
     requestor_id BIGINT,
     description  VARCHAR(1000),
+    created timestamp,
     CONSTRAINT fk_requests_to_users FOREIGN KEY (requestor_id) REFERENCES users (id)
 );
 
