@@ -115,6 +115,7 @@ public class ItemServiceImpl implements ItemService {
                 dto.getName() != null && !dto.getName().isBlank();
     }
 */
+
     @Override
     @Transactional(readOnly = true)
     public List<ItemDto> search(String query, PageRequest pageRequest) {
