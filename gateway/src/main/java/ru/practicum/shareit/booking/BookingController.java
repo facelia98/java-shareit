@@ -33,7 +33,7 @@ public class BookingController {
                                                 @PathVariable("bookingId") Long bookingId,
                                                 @RequestParam(value = "approved") String approved) {
         log.info("Update booking bookingId={}, userId={}", bookingId, userId);
-        return bookingClient.updateBooking(userId, bookingId, Boolean.parseBoolean(approved));
+        return bookingClient.updateBooking(userId, bookingId, approved);
     }
 
     //findById

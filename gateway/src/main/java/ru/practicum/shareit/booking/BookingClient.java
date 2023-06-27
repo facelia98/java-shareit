@@ -28,15 +28,18 @@ public class BookingClient extends BaseClient {
 
     //addNewBooking
     public ResponseEntity<Object> bookItem(long userId, BookItemRequestDto requestDto) {
+        if (!requestDto.getStart().isBefore(requestDto.getEnd())) {
+            return ResponseEntity.badRequest().build();
+        }
         return post("", userId, requestDto);
     }
 
     //updateBooking
-    public ResponseEntity<Object> updateBooking(long userId, long bookingId, boolean approved) {
+    public ResponseEntity<Object> updateBooking(long userId, long bookingId, String approved) {
         Map<String, Object> parameters = Map.of(
                 "approved", approved
         );
-        return patch("/" + bookingId, userId, parameters);
+        return patch("/" + bookingId + "?approved=" + approved, userId, parameters);
     }
 
     //findById

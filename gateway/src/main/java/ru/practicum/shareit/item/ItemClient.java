@@ -58,7 +58,7 @@ public class ItemClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("?text={query}", userId, parameters);
+        return get("/search?text=" + query, userId, parameters);
     }
 
     //addNewItem
