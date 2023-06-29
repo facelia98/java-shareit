@@ -20,11 +20,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto add(UserDto dto) {
         log.info("POST user request received to endpoint [/users]");
-        /*if (userValidate(dto)) {
-            } else {
-            log.error("User validation exception");
-            throw new ValidationException("UserDTO validation exception");
-        }*/
         return checkEmail(dto.getEmail()) ?
                 UserMapper.toUserDto(userRepository.save(UserMapper.toUser(dto))) : null;
     }
@@ -82,11 +77,4 @@ public class UserServiceImpl implements UserService {
         }
         return true;
     }
-/*
-    public boolean userValidate(UserDto dto) {
-        return dto.getName() != null &&
-                dto.getEmail() != null &&
-                !dto.getName().isBlank();
-    }
- */
 }

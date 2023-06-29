@@ -38,10 +38,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto add(ItemDto dto, Long userId) {
         log.info("POST item request received to endpoint [/items]");
-        /*if (!validation(dto)) {
-            log.error("Validation exception for item");
-            throw new ValidationException("Item is invalid");
-        }*/
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User not found for id = %d", userId)));
         if (dto.getRequestId() == null) {
@@ -108,13 +104,6 @@ public class ItemServiceImpl implements ItemService {
                 .sorted(Comparator.comparing(ItemRDto::getId))
                 .collect(Collectors.toList());
     }
-/*
-    private boolean validation(ItemDto dto) {
-        return dto.getAvailable() != null &&
-                dto.getDescription() != null && !dto.getDescription().isBlank() &&
-                dto.getName() != null && !dto.getName().isBlank();
-    }
-*/
 
     @Override
     @Transactional(readOnly = true)
@@ -142,12 +131,6 @@ public class ItemServiceImpl implements ItemService {
                     log.error("Item not found exception for id = {}", userId);
                     throw new NotFoundException(String.format("Item not found for id = %d", userId));
                 });
-        /*
-        if (comment.getText().isBlank()) {
-            log.error("Comment is empty!");
-            throw new ValidationException("Blank comment value!");
-        }
-         */
         if (bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatusNot(userId, itemId, LocalDateTime.now(), Status.REJECTED).isEmpty()) {
             log.warn("Booking for item_id = {} by user_id = {} is not ended!", itemId, userId);
             throw new ValidationException("Booking is not ended!");
